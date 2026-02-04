@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Be My Valentine</title>
+  <style>
+    body {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: Arial, sans-serif;
+      background: #ffe6ea;
+      overflow: hidden;
+      cursor: default;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+      color: #d6336c;
+      text-align: center;
+    }
+
+    #message {
+      height: 24px;
+      margin-bottom: 20px;
+      color: #6c757d;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .buttons {
+      position: relative;
+      width: 320px;
+      height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    button {
+      padding: 12px 24px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    #yes {
+      background-color: #ff4d6d;
+      color: white;
+      transition: transform 0.2s;
+      z-index: 2;
+    }
+
+    #no {
+      background-color: #adb5bd;
+      color: white;
+      position: absolute;
+      transition: left 0.15s, top 0.15s;
+    }
+
+    /* Heart cursor near YES */
+    .heart-cursor {
+      cursor: url('data:image/svg+xml;utf8,\
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32">\
+      <text x="0" y="24" font-size="24">💖</text></svg>') 16 16, auto;
+    }
+
+    /* Shake animation */
+    @keyframes shake {
+      0% { transform: translate(0, 0); }
+      25% { transform: translate(-3px, 2px); }
+      50% { transform: translate(3px, -2px); }
+      75% { transform: translate(-3px, -2px); }
+      100% { transform: translate(0, 0); }
+    }
+
+    .shake {
+      animation: shake 0.25s;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Will you be my Valentine? 💖</h1>
+  <div id="message"></div>
+
+  <div class="buttons">
+    <button id="yes">Yes</button>
+    <button id="no">No</button>
+  </div>
+
+  <script>
+    const noBtn = document.getElementById("no");
+    const yesBtn = document.getElementById("yes");
+    const container = document.querySelector(".buttons");
+    const message = document.getElementById("message");
+
+    let attempts = 0;
+    let moving = false;
+
+    const messages = [
+      "Wait— 😳",
+      "Hold on...",
+      "Are you sure?",
+      "😰😰😰",
+      "NOPE.",
+      "Nice try 😏",
+      "Absolutely not."
+    ];
+
+    // Place NO next to YES initially
+    function placeNoNextToYes() {
+      const yesRect = yesBtn.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+
+      noBtn.style.left = (yesRect.right - containerRect.left + 20) + "px";
+      noBtn.style.top = (yesRect.top - containerRect.top) + "px";
+    }
+
+    placeNoNextToYes();
+
+    function teleportNo() {
+      const maxX = container.clientWidth - noBtn.offsetWidth;
+      const maxY = container.clientHeight - noBtn.offsetHeight;
+
+      noBtn.style.left = Math.random() * maxX + "px";
+      noBtn.style.top = Math.random() * maxY + "px";
+    }
+
+    function attemptEscape() {
+      if (moving) return;
+      moving = true;
+      attempts++;
+
+      message.textContent =
+        messages[Math.floor(Math.random() * messages.length)];
+
+      // Shake first
+      noBtn.classList.add("shake");
+
+      setTimeout(() => {
+        noBtn.classList.remove("shake");
+        teleportNo();
+
+        // Grow YES
+        yesBtn.style.transform = `scale(${1 + attempts * 0.05})`;
+
+        moving = false;
+      }, 250);
+    }
+
+    // Desktop
+    noBtn.addEventListener("mouseover", attemptEscape);
+    noBtn.addEventListener("pointerenter", attemptEscape);
+
+    // Mobile
+    noBtn.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      attemptEscape();
+    });
+
+    // Heart cursor near YES
+    yesBtn.addEventListener("mouseenter", () => {
+      document.body.classList.add("heart-cursor");
+    });
+
+    yesBtn.addEventListener("mouseleave", () => {
+      document.body.classList.remove("heart-cursor");
+    });
+
+    // YES wins
+    yesBtn.addEventListener("click", () => {
+      document.body.innerHTML = `
+        <h1>YAYYYY 💘🥰</h1>
+        <p>You are officially my Valentine 💕</p>
+        <p>I love you babyshu 🥹😘 </p>
+        <p style="font-size:12px;color:#6c757d;">(There was never a choice)</p>
+      `;
+    });
+  </script>
+
+</body>
+</html>
